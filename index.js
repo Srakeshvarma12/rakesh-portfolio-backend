@@ -5,16 +5,17 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ Use dynamic PORT (Render compatible)
+// Render provides PORT automatically
 const PORT = process.env.PORT || 5000;
 
-// ✅ Middleware
+// Middleware
 app.use(
   cors({
     origin: "https://rakesh-portfolio-wheat.vercel.app",
     methods: ["GET", "POST"],
   })
 );
+
 app.use(express.json());
 
 // ✅ Test route
@@ -22,23 +23,18 @@ app.get("/test", (req, res) => {
   res.send("Server is working");
 });
 
-// ✅ Email route (CORRECT)
+// ✅ Send Email route
 app.post("/send-email", async (req, res) => {
   const { email, message } = req.body;
 
   console.log("📩 /send-email hit");
   console.log("Body received:", req.body);
 
-  // Validate input
   if (!email || !message) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing email or message",
-    });
+    return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
   try {
-    // Create transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -47,7 +43,6 @@ app.post("/send-email", async (req, res) => {
       },
     });
 
-    // Send email
     await transporter.sendMail({
       from: email,
       to: process.env.EMAIL_USER,
@@ -55,7 +50,6 @@ app.post("/send-email", async (req, res) => {
       text: `From: ${email}\n\nMessage:\n${message}`,
     });
 
-    console.log("✅ Email sent successfully");
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("❌ Email error:", error);
@@ -63,7 +57,7 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// ✅ Start server (LAST LINE)
+// ✅ Start server (MUST be last)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
