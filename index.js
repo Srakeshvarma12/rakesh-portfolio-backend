@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://YOUR_FRONTEND_DOMAIN.vercel.app"
+      "https://rakesh-portfolio-wheat.vercel.app/"
     ],
     methods: ["GET", "POST"],
     credentials: true
