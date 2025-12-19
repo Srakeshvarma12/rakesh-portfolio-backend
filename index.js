@@ -5,56 +5,40 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ IMPORTANT: Use dynamic PORT for deployment
+// ✅ Use dynamic PORT (Render compatible)
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// ✅ Middleware
 app.use(
   cors({
     origin: "https://rakesh-portfolio-wheat.vercel.app",
     methods: ["GET", "POST"],
-    credentials: true
   })
 );
-
-
 app.use(express.json());
 
-// ✅ TEST ROUTE
+// ✅ Test route
 app.get("/test", (req, res) => {
   res.send("Server is working");
 });
 
-// ✅ EMAIL ROUTE
+// ✅ Email route (CORRECT)
 app.post("/send-email", async (req, res) => {
+  const { email, message } = req.body;
+
   console.log("📩 /send-email hit");
-  console.log("Body:", req.body);
+  console.log("Body received:", req.body);
 
-  res.status(200).json({ success: true });
-});
-try {
-  await transporter.sendMail({
-    from: email,
-    to: process.env.EMAIL_USER,
-    subject: "New Contact Message from Portfolio",
-    text: `From: ${email}\n\nMessage:\n${message}`,
-  });
-
-  res.json({ success: true });
-} catch (error) {
-  console.error("Email error:", error);
-  res.status(500).json({ success: false });
-}
-
-
+  // Validate input
   if (!email || !message) {
     return res.status(400).json({
       success: false,
-      message: "Missing fields",
+      message: "Missing email or message",
     });
   }
 
   try {
+    // Create transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -63,6 +47,7 @@ try {
       },
     });
 
+    // Send email
     await transporter.sendMail({
       from: email,
       to: process.env.EMAIL_USER,
@@ -70,14 +55,15 @@ try {
       text: `From: ${email}\n\nMessage:\n${message}`,
     });
 
-    res.json({ success: true });
+    console.log("✅ Email sent successfully");
+    res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Email error:", error);
+    console.error("❌ Email error:", error);
     res.status(500).json({ success: false });
   }
 });
 
-// ✅ START SERVER (LAST LINE)
+// ✅ Start server (LAST LINE)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
