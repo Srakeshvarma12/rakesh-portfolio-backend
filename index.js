@@ -26,12 +26,25 @@ app.get("/test", (req, res) => {
 });
 
 // ✅ EMAIL ROUTE
-app.post("/send-email", (req, res) => {
+app.post("/send-email", async (req, res) => {
   console.log("📩 /send-email hit");
   console.log("Body:", req.body);
 
   res.status(200).json({ success: true });
 });
+try {
+  await transporter.sendMail({
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: "New Contact Message from Portfolio",
+    text: `From: ${email}\n\nMessage:\n${message}`,
+  });
+
+  res.json({ success: true });
+} catch (error) {
+  console.error("Email error:", error);
+  res.status(500).json({ success: false });
+}
 
 
   if (!email || !message) {
