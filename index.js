@@ -27,6 +27,8 @@ app.get("/test", (req, res) => {
 
 // ✅ EMAIL ROUTE
 app.post("/send-email", async (req, res) => {
+  console.log("📩 /send-email hit");
+  console.log("Body received:", req.body);
   const { email, message } = req.body;
 
   if (!email || !message) {
