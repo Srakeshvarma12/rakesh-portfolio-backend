@@ -26,10 +26,13 @@ app.get("/test", (req, res) => {
 });
 
 // ✅ EMAIL ROUTE
-app.post("/send-email", async (req, res) => {
+app.post("/send-email", (req, res) => {
   console.log("📩 /send-email hit");
-  console.log("Body received:", req.body);
-  const { email, message } = req.body;
+  console.log("Body:", req.body);
+
+  res.status(200).json({ success: true });
+});
+
 
   if (!email || !message) {
     return res.status(400).json({
