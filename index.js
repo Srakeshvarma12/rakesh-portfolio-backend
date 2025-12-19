@@ -4,13 +4,9 @@ const { Resend } = require("resend");
 require("dotenv").config();
 
 const app = express();
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-
-// Render provides PORT automatically
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// ✅ CORS (Frontend → Backend)
 app.use(
   cors({
     origin: "https://rakesh-portfolio-wheat.vercel.app",
@@ -20,46 +16,48 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Test route
+// ✅ Health Check
 app.get("/test", (req, res) => {
   res.send("Server is working");
 });
 
-// ✅ Send Email route
+// ✅ Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// ✅ Send Email Route
 app.post("/send-email", async (req, res) => {
   const { email, message } = req.body;
 
-  console.log("📩 /send-email hit");
-  console.log("Body received:", req.body);
-
   if (!email || !message) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
+    return res.status(400).json({
+      success: false,
+      message: "Missing email or message",
+    });
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: email,
-      to: process.env.EMAIL_USER,
+    await resend.emails.send({
+      from: "Portfolio Contact <onboarding@resend.dev>",
+      to: ["srvarma2004@gmail.com"],
       subject: "New Contact Message from Portfolio",
-      text: `From: ${email}\n\nMessage:\n${message}`,
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>New Portfolio Message</h2>
+          <p><strong>From:</strong> ${email}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message}</p>
+        </div>
+      `,
     });
 
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("❌ Email error:", error);
+    console.error("Resend error:", error);
     res.status(500).json({ success: false });
   }
 });
 
-// ✅ Start server (MUST be last)
+// ✅ Start Server (LAST)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
