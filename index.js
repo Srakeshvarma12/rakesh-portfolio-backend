@@ -11,14 +11,12 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://rakesh-portfolio-wheat.vercel.app/"
-    ],
+    origin: "https://rakesh-portfolio-wheat.vercel.app",
     methods: ["GET", "POST"],
     credentials: true
   })
 );
+
 
 app.use(express.json());
 
