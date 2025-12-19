@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 require("dotenv").config();
 
 const app = express();
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 // Render provides PORT automatically
 const PORT = process.env.PORT || 5000;
