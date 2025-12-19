@@ -11,10 +11,15 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: "*", // TEMP: allow all (safe for now)
+    origin: [
+      "http://localhost:5173",
+      "https://YOUR_FRONTEND_DOMAIN.vercel.app"
+    ],
     methods: ["GET", "POST"],
+    credentials: true
   })
 );
+
 app.use(express.json());
 
 // ✅ TEST ROUTE
